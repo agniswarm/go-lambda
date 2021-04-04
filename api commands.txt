@@ -1,0 +1,16 @@
+aws apigateway create-resource --rest-api-id ewj8w6qy78 --parent-id 5fflf0juia --path-part books
+aws apigateway put-method --rest-api-id ewj8w6qy78 --resource-id qlbgso --http-method ANY --authorization-type NONE
+
+aws apigateway put-integration --rest-api-id ewj8w6qy78 --resource-id qlbgso --http-method ANY --type AWS_PROXY --integration-http-method POST --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:095308708870:function:go-test/invocations
+
+aws apigateway test-invoke-method --rest-api-id ewj8w6qy78 --resource-id qlbgso --http-method "GET"
+
+aws lambda add-permission --function-name go-test --statement-id e066bdb8-b974-4b62-b928-9e90427426c7 --action lambda:InvokeFunction --principal apigateway.amazonaws.com --source-arn arn:aws:execute-api:us-east-1:095308708870:ewj8w6qy78/*/*/books
+
+aws apigateway create-deployment --rest-api-id ewj8w6qy78 --stage-name api
+
+curl https://ewj8w6qy78.execute-api.us-east-1.amazonaws.com/api/books?isbn=978-1420931693
+
+curl https://ewj8w6qy78.execute-api.us-east-1.amazonaws.com/api/books?isbn=foobar
+
+curl -H "Content-Type: application/json" -X POST -d '{"isbn":"978-0141439587", "title":"Emma", "author": "Jane Austen"}' https://ewj8w6qy78.execute-api.us-east-1.amazonaws.com/api/books
