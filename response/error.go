@@ -1,27 +1,25 @@
 package response
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/aws/aws-lambda-go/events"
 )
 
 var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
 
-func ServerError(err error) (events.APIGatewayProxyResponse, error) {
+func ServerError(w http.ResponseWriter, err error) {
 	errorLogger.Println(err.Error())
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusInternalServerError,
-		Body:       http.StatusText(http.StatusInternalServerError),
-	}, nil
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, "{\"message\": \"Internal Server Error\"}")
 }
 
-func ClientError(status int) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Body:       http.StatusText(status),
-	}, nil
+func ClientError(w http.ResponseWriter, statusCode int) {
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, "{\"message\": %s", http.StatusText(statusCode))
+
 }

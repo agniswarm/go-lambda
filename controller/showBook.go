@@ -2,34 +2,36 @@ package controller
 
 import (
 	"encoding/json"
-	"golambda/response"
-	"golambda/services"
 	"net/http"
 	"regexp"
 
-	"github.com/aws/aws-lambda-go/events"
+	"github.com/agniswarm/go-lambda/response"
+	"github.com/agniswarm/go-lambda/services"
 )
 
 var IsbnRegexp = regexp.MustCompile(`[0-9]{3}\-[0-9]{10}`)
 
-func Show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	isbn := req.QueryStringParameters["isbn"]
+func Show(w http.ResponseWriter, req *http.Request) {
+
+	isbn := req.URL.Query().Get("isbn")
 	if !IsbnRegexp.MatchString(isbn) {
-		return response.ClientError(http.StatusBadRequest)
+		response.ClientError(w, http.StatusBadRequest)
+		return
 	}
 	bk, err := services.GetBook(isbn)
 	if err != nil {
-		return response.ServerError(err)
+		response.ClientError(w, http.StatusBadRequest)
+		return
 	}
 	if bk == nil {
-		return response.ClientError(http.StatusNotFound)
+		response.ClientError(w, http.StatusNotFound)
+		return
 	}
 	js, err := json.Marshal(bk)
 	if err != nil {
-		return response.ServerError(err)
+		response.ServerError(w, err)
+		return
 	}
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Body:       string(js),
-	}, nil
+	response.SendResponse(w, http.StatusOK, string(js))
+	return
 }

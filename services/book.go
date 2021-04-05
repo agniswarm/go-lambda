@@ -1,9 +1,8 @@
 package services
 
 import (
-	"golambda/config"
-	"golambda/models"
-
+	"github.com/agniswarm/go-lambda/config"
+	"github.com/agniswarm/go-lambda/models"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
