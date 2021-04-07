@@ -1,16 +1,13 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/agniswarm/go-lambda/controller"
-	"github.com/gorilla/mux"
+	"github.com/agniswarm/go-lambda/middleware"
+	"github.com/gofiber/fiber/v2"
 )
 
-func Router() *mux.Router {
-	r := mux.NewRouter()
-	bookRouter := r.PathPrefix("/book").Subrouter()
-	bookRouter.HandleFunc("/read", controller.Show).Methods(http.MethodGet)
-	bookRouter.HandleFunc("/create", controller.CreateBook).Methods(http.MethodPost)
-	return r
+func Router(app *fiber.App) {
+	bookRoute := app.Group("/book")
+	bookRoute.Get("/read", controller.Show)
+	bookRoute.Post("/create", middleware.BookValidator(), controller.CreateBook)
 }

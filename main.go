@@ -7,7 +7,8 @@ import (
 	"github.com/agniswarm/go-lambda/router"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/aws-lambda-go-api-proxy/gorillamux"
+	fiberadaptor "github.com/awslabs/aws-lambda-go-api-proxy/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -21,7 +22,11 @@ func main() {
 func handler(context context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// js, _ := json.Marshal(event)
 	// fmt.Println(string(js))
-	adapter := gorillamux.New(router.Router())
+	app := fiber.New()
+
+	router.Router(app)
+
+	adapter := fiberadaptor.New(app)
 	res, err := adapter.ProxyWithContext(context, event)
 	fmt.Println(res)
 	return res, err
