@@ -1,6 +1,7 @@
 package response
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,12 +15,12 @@ func ServerError(w http.ResponseWriter, err error) {
 
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, "{\"message\": \"Internal Server Error\"}")
+	json.NewEncoder(w).Encode(fmt.Sprintf("{\"message\": %s", http.StatusText(http.StatusInternalServerError)))
 }
 
 func ClientError(w http.ResponseWriter, statusCode int) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, "{\"message\": %s", http.StatusText(statusCode))
+	json.NewEncoder(w).Encode(fmt.Sprintf("{\"message\": %s", http.StatusText(statusCode)))
 
 }

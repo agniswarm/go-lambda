@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"regexp"
 
@@ -12,7 +13,7 @@ import (
 var IsbnRegexp = regexp.MustCompile(`[0-9]{3}\-[0-9]{10}`)
 
 func Show(w http.ResponseWriter, req *http.Request) {
-
+	fmt.Println(req)
 	isbn := req.URL.Query().Get("isbn")
 	if !IsbnRegexp.MatchString(isbn) {
 		response.ClientError(w, http.StatusBadRequest)
@@ -32,6 +33,6 @@ func Show(w http.ResponseWriter, req *http.Request) {
 		response.ServerError(w, err)
 		return
 	}
-	response.SendResponse(w, http.StatusOK, string(js))
+	response.SendResponse(w, http.StatusOK, js)
 	return
 }

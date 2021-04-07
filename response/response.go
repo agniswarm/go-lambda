@@ -1,12 +1,13 @@
 package response
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
-func SendResponse(w http.ResponseWriter, statusCode int, message string) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, message)
+func SendResponse(w http.ResponseWriter, statusCode int, message interface{}) {
+	w.WriteHeader(statusCode)
+	w.Header().Set("Content-Type", "application/json")
+	// js, _ := json.Marshal(message)
+	json.NewEncoder(w).Encode(message)
 }
